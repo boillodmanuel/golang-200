@@ -68,18 +68,25 @@ func (s *TaskDAOMongo) getAllTasksByQuery(query interface{}, start, end int) ([]
 	// TODO Copy the current MongoDB session
 	// TODO defer the close of the session
 	// TODO retrieve the collection from the session using const
+	session := s.session.Copy()
+	defer session.Close()
+	c := session.DB("").C(collection)
 
-	// TODO check param start and end are not set to NoPaging and are ordered or equal
-	hasPaging := true
+	// check param
+	hasPaging := start > NoPaging && end > NoPaging && end >= start
 
 	// perform request
 	var err error
-	tasks := []model.Task{}
+	var tasks []model.Task
 	if hasPaging {
-		// TODO use the Find method with Skip and Limit (to be calculated) parameters to retrieve all the results
-		// TODO TIP : if start == end, limit must be one
+		err = c.Find(query).Skip(start).Limit(end - start + 1).All(&tasks)
 	} else {
-		// TODO use only the Find method
+		err = c.Find(query).All(&tasks)
+	}
+
+	// if no result found wrap with dao known error
+	if err != nil && err == mgo.ErrNotFound {
+		return nil, ErrNotFound
 	}
 
 	return tasks, err

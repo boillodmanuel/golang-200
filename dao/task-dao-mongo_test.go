@@ -5,19 +5,19 @@ import (
 	"github.com/Sfeir/golang-200/dao"
 	"github.com/Sfeir/golang-200/model"
 	"github.com/satori/go.uuid"
-	"os"
 	"testing"
 	"time"
 )
 
 func TestDAOMongo(t *testing.T) {
 	// get host IP
-	dbHost := os.Getenv("DB_HOST")
+	dbHost := "localhost" //os.Getenv("DB_HOST")
 	db := fmt.Sprintf("mongodb://%s/tasks", dbHost)
 
 	daoMongo, err := dao.GetTaskDAO(db, "", dao.DAOMongo)
 	if err != nil {
 		t.Error(err)
+		t.FailNow()
 	}
 
 	toSave := model.Task{
@@ -40,6 +40,10 @@ func TestDAOMongo(t *testing.T) {
 	tasks, err := daoMongo.GetAll(dao.NoPaging, dao.NoPaging)
 	if err != nil {
 		t.Error(err)
+	}
+	if len(tasks) == 0 {
+		t.Error("no results")
+		t.FailNow()
 	}
 
 	t.Log("initial task found all", tasks[0])
