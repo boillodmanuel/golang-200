@@ -99,7 +99,18 @@ func (s *TaskDAOMock) getBy(filter func(task *model.Task) bool) ([]model.Task, e
 	// TODO check content length and return ErrNotFound if empty
 	// TODO return the filtered result
 
-	return nil, nil
+	r := make([]model.Task, 0, 10)
+
+	for _, v := range s.storage {
+		if filter(v) {
+			r = append(r, *v)
+		}
+	}
+
+	if len(r) == 0 {
+		return nil, ErrNotFound
+	}
+	return r, nil
 }
 
 // Save saves the task

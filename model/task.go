@@ -60,3 +60,26 @@ func (t Task) Equal(task Task) bool {
 		t.CreationDate.Equal(task.CreationDate) &&
 		t.DueDate.Equal(task.DueDate)
 }
+
+type taskPrivate struct {
+	ID           string       `json:"id,omitempty" bson:"id"`
+	Title        string       `json:"title" bson:"title"`
+	Description  string       `json:"description" bson:"description"`
+	Status       TaskStatus   `json:"status" bson:"status"`
+	Priority     TaskPriority `json:"priority" bson:"priority"`
+	CreationDate time.Time    `json:"creationDate" bson:"creationDate"`
+	DueDate      time.Time    `json:"dueDate" bson:"dueDate"`
+}
+// NewTask sets a new ID of the Task as a string
+func NewTaskPrivate() *taskPrivate {
+	return &taskPrivate{
+		ID:           uuid.NewV4().String(),
+		CreationDate: time.Now(),
+		Status:       StatusTodo,
+		Priority:     PriorityMedium,
+	}
+}
+// Equal compares a Task to another and returns true if they are equal false otherwise
+func (t taskPrivate) PrintMe() string {
+	return "me"
+}

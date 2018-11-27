@@ -92,7 +92,7 @@ func GetTaskDAO(cnxStr, migrationPath string, daoType DBType) (TaskDAO, error) {
 		return nil, nil
 	case DAOMock:
 		// TODO return a new mocked DAO instance
-		return nil, nil
+		return NewTaskDAOMock(), nil
 	default:
 		return nil, ErrorDAONotFound
 	}
