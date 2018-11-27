@@ -39,6 +39,8 @@ var (
 )
 
 func main() {
+	time.Local = time.UTC
+
 	// new app
 	app := cli.NewApp()
 	app.Name = utils.AppName
