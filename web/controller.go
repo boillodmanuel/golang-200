@@ -3,45 +3,27 @@ package web
 import (
 	"github.com/Sfeir/golang-200/dao"
 	"github.com/Sfeir/golang-200/model"
+	"github.com/gorilla/mux"
 	logger "github.com/sirupsen/logrus"
 	"net/http"
 	"strconv"
 )
 
-const (
-	prefix = "/tasks"
-)
-
 // TaskController is a controller for tasks resource
 type TaskController struct {
 	taskDao dao.TaskDAO
-	Routes  []Route
-	Prefix  string
 }
 
 // NewTaskController creates a new task controller to manage tasks
-func NewTaskController(taskDAO dao.TaskDAO) *TaskController {
+func NewTaskController(taskDAO dao.TaskDAO, router *mux.Router) *TaskController {
 	controller := TaskController{
 		taskDao: taskDAO,
-		Prefix:  prefix,
 	}
 
-	// build routes
-	routes := []Route{}
-	// GetAll
-	routes = append(routes, Route{
-		Name:        "Get all tasks",
-		Method:      http.MethodGet,
-		Pattern:     "",
-		HandlerFunc: controller.GetAll,
-	})
-	// Get
-	routes = append(routes, Route{
-		Name:        "Get one task",
-		Method:      http.MethodGet,
-		Pattern:     "/{id}",
-		HandlerFunc: controller.Get,
-	})
+	s := router.PathPrefix("/tasks").Subrouter()
+	s.HandleFunc("", controller.GetAll).Methods(http.MethodGet).Name("Get all tasks")
+	s.HandleFunc("/{id}", controller.Get).Methods(http.MethodGet).Name("Get one task")
+
 	// TODO add the create route as a Post with no ID, calling create method
 	// Create
 
@@ -50,8 +32,6 @@ func NewTaskController(taskDAO dao.TaskDAO) *TaskController {
 
 	// TODO add the delete route as a Delete with an ID url param, calling Delete method
 	// Delete
-
-	controller.Routes = routes
 
 	return &controller
 }
